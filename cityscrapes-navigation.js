@@ -2,10 +2,6 @@ var returnButton;
 var debugLabel = 'hrs6';
 var browserID = '{3cad459f-fce0-43e2-b71a-59c8597ed483}';
 
-// Notes:
-// Laptop fullscreen display is 1920 x 1080
-// Browser 800 x 600
-
 function wireButton() {
   if (returnButton) { return; }
   returnButton = Overlays.addOverlay("image", {
