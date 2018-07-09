@@ -5,5 +5,8 @@ img, body {
 img {
     width: 1888px;
     height: 1062px;
+    /* half scale */
+    /* width: 944px; */
+    /* height: 531px; */
     object-fit: cover;
 }
