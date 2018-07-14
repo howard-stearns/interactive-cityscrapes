@@ -1,5 +1,5 @@
 var returnButton;
-var debugLabel = 'hrs6';
+var debugLabel = 'hrs7';
 var browserID = '{bb521a02-3d14-480c-809c-bc7c89375891}'; // Entity Id of the browser's Web Entity.
 var home = 'black-microchip-7727';
 
@@ -20,26 +20,39 @@ var touchMapping = Controller.newMapping(script + 'touch');
 // Keyboard.MouseWheelLeft/Right => Actions.BOOM_OUT/IN
 // Touchscreen.GesturePinchOut/In => Actions.BoomOut/In w/scale
 
+var actions = Controller.Actions;
 var keyboard = Controller.Hardware.Keyboard;
+var vscale = 0.05;
+var hscale = 0.05;
 if (keyboard) {
-    lockedMapping.from(keyboard.MouseWheelLeft).to(function () { print('HRS IGNORE MouseWheelLeft BOOM_OUT'); });
-    lockedMapping.from(keyboard.MouseWheelRight).to(function () { print('HRS IGNORE MouseWheelRight BOOM_IN'); })
-    lockedMapping.from(keyboard.TouchpadUp).to(function () { print('HRS IGNORE TouchpadUp PITCH_UP'); });
-    lockedMapping.from(keyboard.TouchpadDown).to(function () { print('HRS IGNORE TouchpadDown PITCH_DOWN'); });
-    lockedMapping.from(keyboard.MouseMoveUp).when(keyboard.RightMouseButton).to(function () { print('HRS IGNORE MouseMoveLeft PITCH_UP'); });
-    lockedMapping.from(keyboard.MouseMoveDown).when(keyboard.RightMouseButton).to(function () { print('HRS IGNORE MouseMoveDown PITCH_DOWN'); });
-    lockedMapping.from(keyboard.MouseMoveUp).when(keyboard.RightMouseButton).to(function () { print('HRS IGNORE MouseMoveLeft PITCH_UP'); });
-    lockedMapping.from(keyboard.MouseMoveLeft).when(keyboard.RightMouseButton).to(function () { print('HRS IGNORE MouseMoveLeft Yaw'); });
-    lockedMapping.from(keyboard.MouseMoveRight).when(keyboard.RightMouseButton).to(function () { print('HRS IGNORE MouseMoveRight Yaw'); });
+    lockedMapping.from(keyboard.MouseWheelLeft).to(function () { print(debugLabel, 'IGNORE MouseWheelLeft BOOM_OUT'); });
+    lockedMapping.from(keyboard.MouseWheelRight).to(function () { print(debugLabel, 'IGNORE MouseWheelRight BOOM_IN'); })
+    lockedMapping.from(keyboard.TouchpadUp).to(function () { print(debugLabel, 'IGNORE TouchpadUp PITCH_UP'); });
+    lockedMapping.from(keyboard.TouchpadDown).to(function () { print(debugLabel, 'IGNORE TouchpadDown PITCH_DOWN'); });
+    lockedMapping.from(keyboard.MouseMoveUp).when(keyboard.RightMouseButton).to(function () { print(debugLabel, 'IGNORE MouseMoveLeft PITCH_UP'); });
+    lockedMapping.from(keyboard.MouseMoveDown).when(keyboard.RightMouseButton).to(function () { print(debugLabel, 'IGNORE MouseMoveDown PITCH_DOWN'); });
+    lockedMapping.from(keyboard.MouseMoveUp).when(keyboard.RightMouseButton).to(function () { print(debugLabel, 'IGNORE MouseMoveLeft PITCH_UP'); });
+    lockedMapping.from(keyboard.MouseMoveLeft).when(keyboard.RightMouseButton).to(function () { print(debugLabel, 'IGNORE MouseMoveLeft Yaw'); });
+    lockedMapping.from(keyboard.MouseMoveRight).when(keyboard.RightMouseButton).to(function () { print(debugLabel, 'IGNORE MouseMoveRight Yaw'); });
+
+    touchMapping.from(keyboard.MouseMoveUp).when(keyboard.RightMouseButton).scale(vscale).to(actions.PITCH_DOWN);
+    touchMapping.from(keyboard.MouseMoveDown).when(keyboard.RightMouseButton).scale(vscale).to(actions.PITCH_UP);
+    touchMapping.from(keyboard.MouseMoveLeft).when(keyboard.RightMouseButton).scale(hscale).to(actions.YAW_RIGHT);
+    touchMapping.from(keyboard.MouseMoveRight).when(keyboard.RightMouseButton).scale(hscale).to(actions.YAW_LEFT);
 }
 var touchscreen = Controller.Hardware.Touchscreen;
 if (touchscreen) {
-    lockedMapping.from(touchscreen.GesturePinchOut).to(function () { print('HRS IGNORE GesturePinchOut BoomOut'); });
-    lockedMapping.from(touchscreen.GesturePinchIn).to(function () { print('HRS IGNORE GesturePinchIn BoomIn'); });
-    lockedMapping.from(touchscreen.DragLeft).to(function () { print('HRS IGNORE DragLeft Yaw'); });
-    lockedMapping.from(touchscreen.DragRight).to(function () { print('HRS IGNORE DragRight Yaw'); });
-    lockedMapping.from(touchscreen.DragUp).to(function () { print('HRS IGNORE DragUp Pitch'); });
-    lockedMapping.from(touchscreen.DragDown).to(function () { print('HRS IGNORE DragDown Pitch'); });
+    lockedMapping.from(touchscreen.GesturePinchOut).to(function () { print(debugLabel, 'IGNORE GesturePinchOut BoomOut'); });
+    lockedMapping.from(touchscreen.GesturePinchIn).to(function () { print(debugLabel, 'IGNORE GesturePinchIn BoomIn'); });
+    lockedMapping.from(touchscreen.DragUp).to(function () { print(debugLabel, 'IGNORE DragUp Pitch'); });
+    lockedMapping.from(touchscreen.DragDown).to(function () { print(debugLabel, 'IGNORE DragDown Pitch'); });
+    lockedMapping.from(touchscreen.DragLeft).to(function () { print(debugLabel, 'IGNORE DragLeft Yaw'); });
+    lockedMapping.from(touchscreen.DragRight).to(function () { print(debugLabel, 'IGNORE DragRight Yaw'); });
+
+    touchMapping.from(touchscreen.DragUp).scale(vscale).to(actions.PITCH_DOWN);
+    touchMapping.from(touchscreen.DragDown).scale(vscale).to(actions.PITCH_UP);
+    touchMapping.from(touchscreen.DragLeft).scale(hscale).to(actions.YAW_RIGHT);
+    touchMapping.from(touchscreen.DragRight).scale(hscale).to(actions.YAW_LEFT);
 }
 
 var lockedEnabled = false;
