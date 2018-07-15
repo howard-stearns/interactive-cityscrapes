@@ -176,7 +176,7 @@ function cleanup() {
 //location.possibleDomainChangeRequiredViaICEForID.disconnect(onPossibleDomainChangeRequiredViaICEForID);
 }
 
-setButton();
+enableLocked(true);
 Script.scriptEnding.connect(cleanup);
 Controller.mousePressEvent.connect(mousePressEvent);
 location.hostChanged.connect(onHostChange);
