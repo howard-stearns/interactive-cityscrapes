@@ -8,6 +8,14 @@ print(debugLabel, 'loading', script);
 var lockedMapping = Controller.newMapping(script + 'locked');
 var touchMapping = Controller.newMapping(script + 'touch');
 
+var FIRST_PERSON = "first person";
+function isFirstPerson() {
+    return Camera.mode === FIRST_PERSON;
+}
+function isNotFirstPerson() {
+    return Camera.mode !== FIRST_PERSON;
+}
+
 // Inherited:
 // Keyboard.A/D => Actions.Yaw
 // Touchscreen.DragLeft/Right => Actions.Yaw w/scale
@@ -26,7 +34,7 @@ var vscale = 0.05;
 var hscale = 0.05;
 if (keyboard) {
     lockedMapping.from(keyboard.MouseWheelLeft).to(function () { print(debugLabel, 'IGNORE MouseWheelLeft BOOM_OUT'); });
-    lockedMapping.from(keyboard.MouseWheelRight).to(function () { print(debugLabel, 'IGNORE MouseWheelRight BOOM_IN'); })
+    lockedMapping.from(keyboard.MouseWheelRight).to(function () { print(debugLabel, 'IGNORE MouseWheelRight BOOM_IN'); });
     lockedMapping.from(keyboard.TouchpadUp).to(function () { print(debugLabel, 'IGNORE TouchpadUp PITCH_UP'); });
     lockedMapping.from(keyboard.TouchpadDown).to(function () { print(debugLabel, 'IGNORE TouchpadDown PITCH_DOWN'); });
     lockedMapping.from(keyboard.MouseMoveUp).when(keyboard.RightMouseButton).to(function () { print(debugLabel, 'IGNORE MouseMoveLeft PITCH_UP'); });
@@ -35,6 +43,8 @@ if (keyboard) {
     lockedMapping.from(keyboard.MouseMoveLeft).when(keyboard.RightMouseButton).to(function () { print(debugLabel, 'IGNORE MouseMoveLeft Yaw'); });
     lockedMapping.from(keyboard.MouseMoveRight).when(keyboard.RightMouseButton).to(function () { print(debugLabel, 'IGNORE MouseMoveRight Yaw'); });
 
+    //touchMapping.from(keyboard.MouseWheelRight).when(isNotFirstPerson).to(actions.BOOM_IN);
+    //touchMapping.from(keyboard.MouseWheelRight).when(isFirstPerson).scale(200).to(function (n) { print(debugLabel, 'zoom', n); }); //actions.LONGITUDINAL_FORWARD);
     touchMapping.from(keyboard.MouseMoveUp).when(keyboard.RightMouseButton).scale(vscale).to(actions.PITCH_DOWN);
     touchMapping.from(keyboard.MouseMoveDown).when(keyboard.RightMouseButton).scale(vscale).to(actions.PITCH_UP);
     touchMapping.from(keyboard.MouseMoveLeft).when(keyboard.RightMouseButton).scale(hscale).to(actions.YAW_RIGHT);
@@ -110,10 +120,20 @@ function wireButtonUnless(toBeUnwired) {
     }
 }
 
+var toolbar = Toolbars.getToolbar("com.highfidelity.interface.toolbar.system");
 function goHome() {
     MyAvatar.resetSensorsAndBody(); // Is there a better way?
-    Camera.setModeString("first person");
+    Camera.setModeString(FIRST_PERSON);
+    AvatarInputs.showAudioTools = false;  // defaults after reset settings to true
+    toolbar.writeProperty("x", 0 - toolbar.readProperty("width") + 5); // slide it out of the way
     location.handleLookupString(home, false);
+    Menu.setIsOptionChecked("Fullscreen", true);
+    Script.setTimeout(function () {
+        toolbar.writeProperty("y", Controller.getViewportDimensions().y - 5) // slide below (so as to avoid menu)
+        if (!Settings.getValue("toolbar/constrainToolbarToCenterX")) { // I couldn't find a way to unset this by script
+            toolbar.writeProperty("x", 0 - toolbar.readProperty("width") + 5); // slide left, too
+        }
+    }, 100); // Can't be while going to fullscreen.
 }
 
 function mousePressEvent(event) {
@@ -176,9 +196,13 @@ function cleanup() {
 //location.possibleDomainChangeRequiredViaICEForID.disconnect(onPossibleDomainChangeRequiredViaICEForID);
 }
 
-enableLocked(true);
 Script.scriptEnding.connect(cleanup);
 Controller.mousePressEvent.connect(mousePressEvent);
 location.hostChanged.connect(onHostChange);
 //location.locationChangeRequired.connect(onLocationChangeRequired);
+if (location.hostname === '') {
+    wireButton();
+} else {
+    enableLocked(true);
+}
 print(debugLabel, 'loaded');
