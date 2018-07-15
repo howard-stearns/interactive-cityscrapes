@@ -1,5 +1,5 @@
 var returnButton;
-var debugLabel = 'hrs7';
+var debugLabel = 'hrs8';
 var browserID = '{bb521a02-3d14-480c-809c-bc7c89375891}'; // Entity Id of the browser's Web Entity.
 var home = 'black-microchip-7727';
 
@@ -122,6 +122,7 @@ function wireButtonUnless(toBeUnwired) {
 
 var toolbar = Toolbars.getToolbar("com.highfidelity.interface.toolbar.system");
 function goHome() {
+    print(debugLabel, 'goHome');
     MyAvatar.resetSensorsAndBody(); // Is there a better way?
     Camera.setModeString(FIRST_PERSON);
     AvatarInputs.showAudioTools = false;  // defaults after reset settings to true
@@ -135,6 +136,36 @@ function goHome() {
         }
     }, 100); // Can't be while going to fullscreen.
 }
+function resetUrlIfNeededAndGoHome() {
+    if (location.hostname === home) { // If we're already here, we won't be reloading, which resets the url.
+        // WebEntity doesn't really reset when you change to what it was last EXTERNALLY set to, even if now on a different page.
+        Entities.editEntity(browserID, {"sourceUrl": "http://aubreyhaase.com/wp-content/uploads/2016/12/blog-3-pic.jpg"});
+        print(debugLabel, 'first set url to', Entities.getEntityProperties(browserID, ["sourceUrl"]).sourceUrl);
+        Script.setTimeout(function () {
+            Entities.editEntity(browserID, {"sourceUrl": "file:///C:/Users/howar_000/Desktop/interactive-cityscrapes/studio.html"});
+            print(debugLabel, 'set url to', Entities.getEntityProperties(browserID, ["sourceUrl"]).sourceUrl);
+            Script.setTimeout(goHome, 100);
+        }, 100);
+    } else {
+        goHome();
+    }
+}
+
+var inactivityTimeout;
+function cancelTimeout() {
+    print(debugLabel, 'cancelTimeout');
+    if (inactivityTimeout) {
+        Script.clearInterval(inactivityTimeout);
+        inactivityTimeout = null;
+    }
+}
+function resetInactivityTimeout() {
+    cancelTimeout();
+    inactivityTimeout = Script.setTimeout(function () {
+        resetUrlIfNeededAndGoHome();
+        resetInactivityTimeout();
+    }, 1000 * 60 * 3);
+}
 
 function mousePressEvent(event) {
     // returnButton is only present when we're travelling.
@@ -146,17 +177,7 @@ function mousePressEvent(event) {
         });
         print(debugLabel, 'clicked:', clickedOverlay, 'button:', returnButton);
         if (clickedOverlay === returnButton) {
-            if (location.hostname === home) { // If we're already here, we won't be reloading, which resets the url.
-                Entities.editEntity(browserID, {"sourceUrl": "http://aubreyhaase.com/wp-content/uploads/2016/12/blog-3-pic.jpg"});
-                print(debugLabel, 'set url to', Entities.getEntityProperties(browserID, ["sourceUrl"]).sourceUrl);
-                Script.setTimeout(function () {
-                    Entities.editEntity(browserID, {"sourceUrl": "file:///C:/Users/howar_000/Desktop/interactive-cityscrapes/studio.html"});
-                    print(debugLabel, 'set url to', Entities.getEntityProperties(browserID, ["sourceUrl"]).sourceUrl);
-                    Script.setTimeout(goHome, 1000);
-                }, 100);
-            } else {
-                goHome();
-            }
+            resetUrlIfNeededAndGoHome();
         }
         return;
     }
@@ -185,6 +206,8 @@ function onHostChange(host) {
 
 function cleanup() {
     print(debugLabel, 'cleanup');
+    cancelTimeout();
+    Controller.mousePressEvent.disconnect(resetInactivityTimeout);
     unwireButton();
     enableLocked(false);
     Controller.mousePressEvent.disconnect(mousePressEvent);
@@ -205,4 +228,5 @@ if (location.hostname === '') {
 } else {
     enableLocked(true);
 }
+Controller.mousePressEvent.connect(resetInactivityTimeout);
 print(debugLabel, 'loaded');
