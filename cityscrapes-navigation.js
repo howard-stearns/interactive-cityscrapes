@@ -136,16 +136,15 @@ function goHome() {
         }
     }, 100); // Can't be while going to fullscreen.
 }
+var home1 = "file:///C:/Users/howar_000/Desktop/interactive-cityscrapes/studio.html";
+var home2 = "file:///C:/Users/howar_000/Desktop/interactive-cityscrapes/studio2.html"; // same content, diff url
 function resetUrlIfNeededAndGoHome() {
     if (location.hostname === home) { // If we're already here, we won't be reloading, which resets the url.
         // WebEntity doesn't really reset when you change to what it was last EXTERNALLY set to, even if now on a different page.
-        Entities.editEntity(browserID, {"sourceUrl": "http://aubreyhaase.com/wp-content/uploads/2016/12/blog-3-pic.jpg"});
-        print(debugLabel, 'first set url to', Entities.getEntityProperties(browserID, ["sourceUrl"]).sourceUrl);
-        Script.setTimeout(function () {
-            Entities.editEntity(browserID, {"sourceUrl": "file:///C:/Users/howar_000/Desktop/interactive-cityscrapes/studio.html"});
-            print(debugLabel, 'set url to', Entities.getEntityProperties(browserID, ["sourceUrl"]).sourceUrl);
-            Script.setTimeout(goHome, 100);
-        }, 100);
+        var current = Entities.getEntityProperties(browserID, ["sourceUrl"]).sourceUrl;
+        var next = (current === home1) ? home2 : home1;
+        Entities.editEntity(browserID, {"sourceUrl": next}); 
+        Script.setTimeout(goHome, 100);
     } else {
         goHome();
     }
