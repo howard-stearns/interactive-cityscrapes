@@ -1,0 +1,29 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+      var piano = new Audio("piano1.wav");
+      var giggle = new Audio("Giggle-SoundBible.com-1295238132.wav");
+      var door = new Audio("Knocking On Door-SoundBible.com-84643603.wav");
+    </script>
+  </head>
+  <body>
+    <img src="studio perspectives.jpg" usemap="#studiomap">
+    <map name="studiomap">
+      
+      <area shape="poly" coords="0,856,0,20,440,80,444,794" href="sistine-chappel.html">
+      <area shape="poly" coords="784,470,784,152,1082,190,1086,466" href="yosemite.html">
+      <area shape="poly" coords="1424,510,1428,240,1702,172,1708,504" href="merida.html">
+      <area shape="poly" coords="590,588,592,536,608,506,576,398,586,376,624,358,630,338,668,336,680,366,722,392,722,418,706,426,704,506,720,534,720,582" href="#" onclick="giggle.play();">
+      <area shape="poly" coords="1124,632,1118,180,1328,216,1336,854,1156,898,1152,638" href="#" onclick="door.play();">
+      <area shape="poly" coords="1584,952,1582,688,1640,676,1648,524,1882,514,1880,1004" href="#" onclick="piano.play();">
+      <!-- Half scale: "1,2".split(',').map(function (s) { return (parseInt(s) * 2).toString(); }).join(',') -->
+      <!-- <area shape="poly" coords="0,428,0,10,220,40,222,397" href="sistine-chappel.html"> -->
+      <!-- <area shape="poly" coords="392,235,392,76,541,95,543,233" href="yosemite.html"> -->
+      <!-- <area shape="poly" coords="712,255,714,120,851,86,854,252" href="merida.html"> -->
+      <!-- <area shape="poly" coords="295,294,296,268,304,253,288,199,293,188,312,179,315,169,334,168,340,183,361,196,361,209,353,213,352,253,360,267,360,291" href="#" onclick="giggle.play();"> -->
+      <!-- <area shape="poly" coords="562,316,559,90,664,108,668,427,578,449,576,319" href="#" onclick="door.play();"> -->
+      <!-- <area shape="poly" coords="792,476,791,344,820,338,824,262,941,257,940,502" href="#" onclick="piano.play();"> -->
+    </map>
+  </body>
+</html>

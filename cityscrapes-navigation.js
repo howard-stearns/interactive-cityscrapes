@@ -32,6 +32,24 @@ var actions = Controller.Actions;
 var keyboard = Controller.Hardware.Keyboard;
 var vscale = 0.05;
 var hscale = 0.05;
+var last = 0, lastTime = 0;
+function debounce(x) {
+    if (!x) {
+        lastTime = Date.now();
+    } else {
+        last = x;
+        lastTime = 0;
+    }
+}
+function debounced() {
+    if (lastTime) {
+        var delta = Date.now() - lastTime;
+        if (delta > 100) {
+            lastTime = last = 0;
+        }
+    }
+    return last;
+}
 if (keyboard) {
     lockedMapping.from(keyboard.MouseWheelLeft).to(function () { print(debugLabel, 'IGNORE MouseWheelLeft BOOM_OUT'); });
     lockedMapping.from(keyboard.MouseWheelRight).to(function () { print(debugLabel, 'IGNORE MouseWheelRight BOOM_IN'); });
@@ -43,8 +61,10 @@ if (keyboard) {
     lockedMapping.from(keyboard.MouseMoveLeft).when(keyboard.RightMouseButton).to(function () { print(debugLabel, 'IGNORE MouseMoveLeft Yaw'); });
     lockedMapping.from(keyboard.MouseMoveRight).when(keyboard.RightMouseButton).to(function () { print(debugLabel, 'IGNORE MouseMoveRight Yaw'); });
 
-    //touchMapping.from(keyboard.MouseWheelRight).when(isNotFirstPerson).to(actions.BOOM_IN);
-    //touchMapping.from(keyboard.MouseWheelRight).when(isFirstPerson).scale(200).to(function (n) { print(debugLabel, 'zoom', n); }); //actions.LONGITUDINAL_FORWARD);
+    touchMapping.from(keyboard.MouseWheelRight).when(isNotFirstPerson).scale(0.02).to(actions.BOOM_IN);
+    touchMapping.from(keyboard.MouseWheelRight).when(isFirstPerson).to(debounce);
+    touchMapping.from(debounced).to(actions.LONGITUDINAL_FORWARD);
+
     touchMapping.from(keyboard.MouseMoveUp).when(keyboard.RightMouseButton).scale(vscale).to(actions.PITCH_DOWN);
     touchMapping.from(keyboard.MouseMoveDown).when(keyboard.RightMouseButton).scale(vscale).to(actions.PITCH_UP);
     touchMapping.from(keyboard.MouseMoveLeft).when(keyboard.RightMouseButton).scale(hscale).to(actions.YAW_RIGHT);
@@ -58,6 +78,10 @@ if (touchscreen) {
     lockedMapping.from(touchscreen.DragDown).to(function () { print(debugLabel, 'IGNORE DragDown Pitch'); });
     lockedMapping.from(touchscreen.DragLeft).to(function () { print(debugLabel, 'IGNORE DragLeft Yaw'); });
     lockedMapping.from(touchscreen.DragRight).to(function () { print(debugLabel, 'IGNORE DragRight Yaw'); });
+
+    touchMapping.from(touchscreen.GesturePinchIn).when(isNotFirstPerson).scale(0.02).to(actions.BoomIn);
+    touchMapping.from(touchscreen.GesturePinchIn).when(isFirstPerson).to(debounce);
+    // there's always a keyboard, above: touchMapping.from(debounced).to(actions.LONGITUDINAL_FORWARD);
 
     touchMapping.from(touchscreen.DragUp).scale(vscale).to(actions.PITCH_DOWN);
     touchMapping.from(touchscreen.DragDown).scale(vscale).to(actions.PITCH_UP);
