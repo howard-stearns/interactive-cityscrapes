@@ -10,3 +10,14 @@ img {
     /* height: 531px; */
     object-fit: cover;
 }
+area {
+    border.none;
+}
+img.map, map area{
+    outline: none;
+}
+area:focus {
+    border: none;
+    outline-style: none; 
+    -moz-outline-style: none;  
+}
